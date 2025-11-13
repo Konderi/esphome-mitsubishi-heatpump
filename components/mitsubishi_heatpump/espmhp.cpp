@@ -48,16 +48,13 @@ MitsubishiHeatPump::MitsubishiHeatPump(
 }
 
 bool MitsubishiHeatPump::verify_serial() {
-    // Removed outdated logger check
-    return true;
-    }
-
 #ifdef USE_LOGGER
     if (this->get_hw_serial_() == logger::global_logger->get_hw_uart()) {
-        ESP_LOGW(TAG, "  You're using the same serial port for logging"
-                " and the MitsubishiHeatPump component. Please disable"
-                " logging over the serial port by setting"
-                " logger:baud_rate to 0.");
+        ESP_LOGW(TAG,
+                 "You're using the same serial port for logging "
+                 "and the MitsubishiHeatPump component. Please disable "
+                 "logging over the serial port by setting "
+                 "logger:baud_rate to 0.");
         return false;
     }
 #endif
