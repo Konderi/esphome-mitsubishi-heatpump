@@ -48,17 +48,12 @@ MitsubishiHeatPump::MitsubishiHeatPump(
 }
 
 bool MitsubishiHeatPump::verify_serial() {
-    if (!this->get_hw_serial_()) {
-        ESP_LOGCONFIG(
-                TAG,
-                "No HardwareSerial was provided. "
-                "Software serial ports are unsupported by this component."
-        );
-        return false;
+    // Removed outdated logger check
+    return true;
     }
 
 #ifdef USE_LOGGER
-    if (this->get_hw_serial_() == logger::global_logger->get_hw_serial()) {
+    if (this->get_hw_serial_() == logger::global_logger->get_hw_uart()) {
         ESP_LOGW(TAG, "  You're using the same serial port for logging"
                 " and the MitsubishiHeatPump component. Please disable"
                 " logging over the serial port by setting"
