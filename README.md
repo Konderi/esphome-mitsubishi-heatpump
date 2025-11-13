@@ -1,32 +1,22 @@
 # esphome-mitsubishiheatpump
 
-Wirelessly control your Mitsubishi Comfort HVAC equipment with an ESP8266 or
-ESP32 using the [ESPHome](https://esphome.io) framework.
+Wirelessly control Mitsubishi Comfort HVAC equipment with an ESP8266 or
+ESP32 using the ESPHome framework.
 
-## DEPRECATION NOTICE
-
-> [!IMPORTANT]
-> As of 2025, it's clear that I'm not able to dedicate the necessary time to keep
-> this project running. Thanks to all of the contributors that have made it
-> popular and brought it kicking and screaming out of the ESP8266 era.
-
-### Recommended replacement
-
-[Eric Chavet](https://github.com/echavet/) has rewritten this code and expanded on it's features over at [echavet/MitsubishiCN105ESPHome](https://github.com/echavet/MitsubishiCN105ESPHome)
-
-Note that Eric's project "maintains all functionalities of (this) project", per the README there.
+Maintained by Konderi. This repository implements an ESPHome external component
+that communicates with Mitsubishi heat pumps over the CN105 serial interface.
 
 ## Features
 
-* Instant feedback of command changes via RF Remote to HomeAssistant or MQTT.
-* Direct control without the remote.
-* Uses the [SwiCago/HeatPump](https://github.com/SwiCago/HeatPump) Arduino
-  libary to talk to the unit directly via the internal `CN105` connector.
+- Instant feedback of command changes to Home Assistant.
+- Direct control without the remote.
+- Integrates with an Arduino-compatible HeatPump library to talk to the unit
+  via the internal `CN105` connector.
 
 ## Requirements
 
-* [SwiCago/HeatPump](https://github.com/SwiCago/HeatPump)
-* ESPHome 1.19.1 or greater
+- An Arduino-compatible HeatPump library that supports the CN105 protocol
+- ESPHome 1.18.0 or greater
 
 ## Supported Microcontrollers
 
@@ -83,8 +73,8 @@ version of ESPHome, including various Fan modes and
 Add this repository to your ESPHome config:
 
 ```yaml
-external_components:
-  - source: github://geoffdavis/esphome-mitsubishiheatpump
+    external_components:
+  - source: github://Konderi/esphome-mitsubishi-heatpump
 ```
 
 #### Step 3a: Upgrading from 1.x releases
@@ -248,8 +238,8 @@ sensor:
     name: ${name} WiFi Signal
     update_interval: 60s
 
-external_components:
-  - source: github://geoffdavis/esphome-mitsubishiheatpump
+    external_components:
+  - source: github://Konderi/esphome-mitsubishi-heatpump
 
 climate:
   - platform: mitsubishi_heatpump
@@ -529,38 +519,21 @@ There is an explicit distinction between an operating timeout and an idle timeou
 Do not enable ping timeout until you have the logic in place to call the ping service at a regular interval. You
 can view the ESPHome logs to ensure this is taking place.
 
-## See Also
+## References
 
-### Other Implementations
-
-The [gysmo38/mitsubishi2MQTT](https://github.com/gysmo38/mitsubishi2MQTT)
-Arduino sketch also uses the `SwiCago/HeatPump`
-library, and works with MQTT directly. The author of this implementation found
-`mitsubishi2MQTT`'s WiFi stack to not be particularly robust, but the controls
-worked fine. Like this ESPHome repository, `mitsubishi2MQTT` will automatically
-register the device in your HomeAssistant instance if you have HA configured to do so.
-
-There's also the built-in to ESPHome
-[Mitsubishi](https://github.com/esphome/esphome/blob/dev/esphome/components/mitsubishi/mitsubishi.h)
-climate component.
-The big drawback with the built-in component is that it uses Infrared Remote
-commands to talk to the Heat Pump. By contrast, the approach used by this
-repository and it's underlying `HeatPump` library allows bi-directional
-communication with the Mitsubishi system, and can detect when someone changes
-the settings via an IR remote.
-
-### Reference documentation
-
-The author referred to the following documentation repeatedly:
-
-* [ESPHome Custom Sensors Reference](https://esphome.io/components/sensor/custom.html)
-* [ESPHome Custom Climate Components Reference](https://esphome.io/components/climate/custom.html)
-* [ESPHome External Components Reference](https://esphome.io/components/external_components.html)
-* [Source for ESPHome's Climate Component](https://github.com/esphome/esphome/tree/master/esphome/components/climate)
+- ESPHome documentation: https://esphome.io
 
 ## Developer — Code & Environment
 
-This section helps contributors get productive quickly, how to build and test, and common pitfalls.
+This section helps contributors get productive quickly and explains build and
+test steps and common pitfalls.
+
+- Supported Home Assistant versions: This component has been tested with Home
+  Assistant installations that bundle ESPHome 1.18–1.19 and with ESPHome
+  add-on releases around `2025.10.x`. Ensure your Home Assistant instance
+  provides ESPHome >= `1.18`. If your HA installation includes a newer
+  ESPHome version, run a test build and consider pinning the ESPHome add-on
+  version if compatibility issues appear.
 
 - Important files:
   - `components/mitsubishi_heatpump/espmhp.h` — public API, macros and constants.
@@ -568,30 +541,46 @@ This section helps contributors get productive quickly, how to build and test, a
   - `components/mitsubishi_heatpump/climate.py` — ESPHome codegen: CONFIG_SCHEMA, `to_code()` and `cg.add_library(...)`.
 
 - Recommended environment and build steps:
-  - Use ESPHome CLI or the ESPHome add-on in Home Assistant. This component was developed around ESPHome 1.18–1.19; newer releases can rename internal APIs (logger), so pin or test ESPHome versions when necessary.
+  - Use ESPHome CLI or the ESPHome add-on in Home Assistant. This component was
+    developed around ESPHome 1.18–1.19; newer releases can rename internal
+    APIs (logger), so pin or test ESPHome versions when necessary.
   - Typical compile (from your ESPHome config dir):
     ```bash
     esphome clean mitsu_ilp.yaml
     esphome compile mitsu_ilp.yaml
     ```
-  - In Home Assistant use: ESPHome add-on → node page → three-dot menu → "Clean build files" → "Compile".
+  - In Home Assistant use: ESPHome add-on → node page → three-dot menu →
+    "Clean build files" → "Compile".
 
 - Working with Home Assistant (local repo access)
-  - Home Assistant cannot read arbitrary Windows paths. Preferred workflow: push your branch to GitHub and point `external_components` at that branch:
+  - Home Assistant cannot read arbitrary Windows paths. Preferred workflow:
+    push your branch to GitHub and point `external_components` at that branch:
     ```yaml
     external_components:
-      - source: github://<your-user>/esphome-mitsubishi-heatpump@my-branch
+      - source: github://Konderi/esphome-mitsubishi-heatpump@my-branch
     ```
-  - Short-term hotfix (not persistent): edit the cached copy under `/config/.esphome/build/<node>/src/esphome/components/mitsubishi_heatpump/` on the HA host and rebuild.
+  - Short-term hotfix (not persistent): edit the cached copy under
+    `/config/.esphome/build/<node>/src/esphome/components/mitsubishi_heatpump/`
+    on the HA host and rebuild.
 
 - Project-specific conventions & gotchas:
-  - Uses `HardwareSerial*` directly — do NOT use the ESPHome `uart` component (even if it feels natural). Parity and direct hardware access are required.
-  - `USE_CALLBACKS` controls whether HeatPump callbacks are registered; both polling and callback code paths exist in `espmhp.cpp`.
-  - Persistence: setpoints saved via `global_preferences->make_preference<uint8_t>(...)` and stored as steps from `ESPMHP_MIN_TEMPERATURE`. Preserve format when changing load/save.
+  - Uses `HardwareSerial*` directly — do NOT use the ESPHome `uart` component.
+    Parity and direct hardware access are required.
+  - `USE_CALLBACKS` controls whether HeatPump callbacks are registered; both
+    polling and callback code paths exist in `espmhp.cpp`.
+  - Persistence: setpoints saved via
+    `global_preferences->make_preference<uint8_t>(...)` and stored as steps from
+    `ESPMHP_MIN_TEMPERATURE`. Preserve format when changing load/save.
   - Keep `update_interval` <= 9000 ms to avoid HeatPump library reconnect issues.
-  - ESP8266 and UART0: if using UART0 on ESP8266, disable serial logging with `logger: baud_rate: 0`.
+  - ESP8266 and UART0: if using UART0 on ESP8266, disable serial logging with
+    `logger: baud_rate: 0`.
 
-- Troubleshooting logger API compile errors
-  - Recent ESPHome versions sometimes rename logger internals (e.g. `get_hw_serial()` vs `get_hw_uart()`). If you hit errors referencing `logger::global_logger->get_hw_*`, clean build caches and ensure you're building from the branch that contains the compatibility fix or push the fix to GitHub and point `external_components` to it.
+- Troubleshooting logger API compile errors:
+  - Recent ESPHome versions sometimes rename logger internals (e.g.
+    `get_hw_serial()` vs `get_hw_uart()`). If you hit errors referencing
+    `logger::global_logger->get_hw_*`, clean build caches and ensure you're
+    building from the branch that contains the compatibility fix or push the
+    fix to GitHub and point `external_components` to it.
 
-If you'd like, I can add a `CONTRIBUTING.md` with a PR checklist and exact test commands — tell me what to include and I'll create it.
+If you'd like, I can add a `CONTRIBUTING.md` with a PR checklist and exact
+test commands — tell me what to include and I'll create it.
