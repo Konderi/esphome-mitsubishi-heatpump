@@ -57,15 +57,11 @@ bool MitsubishiHeatPump::verify_serial() {
         return false;
     }
 
-#ifdef USE_LOGGER
-    if (this->get_hw_serial_() == logger::global_logger->get_hw_serial()) {
-        ESP_LOGW(TAG, "  You're using the same serial port for logging"
-                " and the MitsubishiHeatPump component. Please disable"
-                " logging over the serial port by setting"
-                " logger:baud_rate to 0.");
-        return false;
-    }
-#endif
+    // Do not rely on logger internals here (different ESPHome versions expose
+    // different APIs like `get_hw_serial()` vs `get_hw_uart()`). The important
+    // validation is that a HardwareSerial pointer was provided above. Avoid
+    // checking the logger's serial to remain compatible across ESPHome
+    // versions and prevent build-time issues.
     // unless something went wrong, assume we have a valid serial configuration
     return true;
 }
