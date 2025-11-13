@@ -557,3 +557,41 @@ The author referred to the following documentation repeatedly:
 * [ESPHome Custom Climate Components Reference](https://esphome.io/components/climate/custom.html)
 * [ESPHome External Components Reference](https://esphome.io/components/external_components.html)
 * [Source for ESPHome's Climate Component](https://github.com/esphome/esphome/tree/master/esphome/components/climate)
+
+## Developer — Code & Environment
+
+This section helps contributors get productive quickly, how to build and test, and common pitfalls.
+
+- Important files:
+  - `components/mitsubishi_heatpump/espmhp.h` — public API, macros and constants.
+  - `components/mitsubishi_heatpump/espmhp.cpp` — implementation: serial handling, mode mapping, persistence and logging.
+  - `components/mitsubishi_heatpump/climate.py` — ESPHome codegen: CONFIG_SCHEMA, `to_code()` and `cg.add_library(...)`.
+
+- Recommended environment and build steps:
+  - Use ESPHome CLI or the ESPHome add-on in Home Assistant. This component was developed around ESPHome 1.18–1.19; newer releases can rename internal APIs (logger), so pin or test ESPHome versions when necessary.
+  - Typical compile (from your ESPHome config dir):
+    ```bash
+    esphome clean mitsu_ilp.yaml
+    esphome compile mitsu_ilp.yaml
+    ```
+  - In Home Assistant use: ESPHome add-on → node page → three-dot menu → "Clean build files" → "Compile".
+
+- Working with Home Assistant (local repo access)
+  - Home Assistant cannot read arbitrary Windows paths. Preferred workflow: push your branch to GitHub and point `external_components` at that branch:
+    ```yaml
+    external_components:
+      - source: github://<your-user>/esphome-mitsubishi-heatpump@my-branch
+    ```
+  - Short-term hotfix (not persistent): edit the cached copy under `/config/.esphome/build/<node>/src/esphome/components/mitsubishi_heatpump/` on the HA host and rebuild.
+
+- Project-specific conventions & gotchas:
+  - Uses `HardwareSerial*` directly — do NOT use the ESPHome `uart` component (even if it feels natural). Parity and direct hardware access are required.
+  - `USE_CALLBACKS` controls whether HeatPump callbacks are registered; both polling and callback code paths exist in `espmhp.cpp`.
+  - Persistence: setpoints saved via `global_preferences->make_preference<uint8_t>(...)` and stored as steps from `ESPMHP_MIN_TEMPERATURE`. Preserve format when changing load/save.
+  - Keep `update_interval` <= 9000 ms to avoid HeatPump library reconnect issues.
+  - ESP8266 and UART0: if using UART0 on ESP8266, disable serial logging with `logger: baud_rate: 0`.
+
+- Troubleshooting logger API compile errors
+  - Recent ESPHome versions sometimes rename logger internals (e.g. `get_hw_serial()` vs `get_hw_uart()`). If you hit errors referencing `logger::global_logger->get_hw_*`, clean build caches and ensure you're building from the branch that contains the compatibility fix or push the fix to GitHub and point `external_components` to it.
+
+If you'd like, I can add a `CONTRIBUTING.md` with a PR checklist and exact test commands — tell me what to include and I'll create it.
