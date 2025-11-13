@@ -53,12 +53,12 @@ bool MitsubishiHeatPump::verify_serial() {
         ESP_LOGW(TAG,
                  "You're using the same serial port for logging "
                  "and the MitsubishiHeatPump component. Please disable "
-                 "logging over the serial port by settings "
+                 "logging over the serial port by setting "
                  "logger:baud_rate to 0.");
         return false;
     }
 #endif
-    // unless something went wrong, assume we have a valid serial configuration
+    // Unless something went wrong, assume we have a valid serial configuration
     return true;
 }
 
