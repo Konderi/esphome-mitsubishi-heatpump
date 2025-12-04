@@ -63,7 +63,7 @@ SELECT_SCHEMA = select._SELECT_SCHEMA.extend(
     {cv.GenerateID(CONF_ID): cv.declare_id(MitsubishiACSelect)}
 )
 
-CONFIG_SCHEMA = climate.CLIMATE_SCHEMA.extend(
+CONFIG_SCHEMA = climate.climate_schema(
     {
         cv.GenerateID(): cv.declare_id(MitsubishiHeatPump),
         cv.Optional(CONF_HARDWARE_UART, default="UART0"): valid_uart,
