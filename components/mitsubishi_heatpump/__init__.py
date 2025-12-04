@@ -63,7 +63,6 @@ def valid_uart(uart):
         raise NotImplementedError("Unsupported platform")
     return cv.one_of(*uarts, upper=True)(uart)
 
-
 SELECT_SCHEMA = select._SELECT_SCHEMA.extend(
     {cv.GenerateID(CONF_ID): cv.declare_id(MitsubishiACSelect)}
 )
