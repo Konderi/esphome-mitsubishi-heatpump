@@ -59,7 +59,7 @@ def valid_uart(uart):
     return cv.one_of(*uarts, upper=True)(uart)
 
 
-SELECT_SCHEMA = select.SELECT_SCHEMA.extend(
+SELECT_SCHEMA = select._SELECT_SCHEMA.extend(
     {cv.GenerateID(CONF_ID): cv.declare_id(MitsubishiACSelect)}
 )
 
